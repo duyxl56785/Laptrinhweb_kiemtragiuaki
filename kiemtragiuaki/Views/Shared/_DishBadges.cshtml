@@ -1,0 +1,17 @@
+@model Dish_BIT240081
+@if (Model.IsAvailable)
+{
+    <span class="pill pill-on"><span class="dot"></span>@L["Status_Available"]</span>
+}
+else
+{
+    <span class="pill pill-off"><span class="dot"></span>@L["Status_Unavailable"]</span>
+}
+@if (Model.IsQuick)
+{
+    <span class="pill pill-quick">⚡ @L["Prep_Quick"]</span>
+}
+else
+{
+    <span class="pill pill-regular">⏱ @L["Prep_Regular"]</span>
+}

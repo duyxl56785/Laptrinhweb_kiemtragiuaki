@@ -1,0 +1,111 @@
+@model DishDetailsViewModel
+@{
+    var d = Model.Dish;
+    ViewData["Title"] = L["Title_DishDetails"];
+    var thumb = d.Images.FirstOrDefault(i => i.IsThumbnail);
+}
+
+<a class="d-inline-block mb-3 text-decoration-none" asp-action="Index">← @L["Btn_Back"]</a>
+
+<section class="detail-hero">
+    <div class="detail-photo">
+        <div class="no-image">@L["Msg_NoImages"]</div>
+        @if (thumb != null)
+        {
+            <img src="@thumb.ImageUrl" alt="@d.Name" class="position-relative" onerror="this.classList.add('img-broken')" />
+        }
+    </div>
+    <div class="surface detail-info">
+        <div>
+            <div class="eyebrow">@d.DishCategory?.Name · #@d.Id</div>
+            <h1>@d.Name</h1>
+        </div>
+        <div class="d-flex flex-wrap gap-2"><partial name="_DishBadges" model="d" /></div>
+        <div class="price">@d.Price.ToString("N0")<small>đ</small></div>
+        <p class="text-body-secondary mb-0">@d.Description</p>
+        <div class="facts">
+            <div class="fact"><span>@L["Field_PreparationTime"]</span><b>@L["Minutes", d.PreparationTime]</b></div>
+            <div class="fact"><span>@L["Field_PrepType"]</span><b>@(d.IsQuick ? L["Prep_Quick"] : L["Prep_Regular"])</b></div>
+            <div class="fact"><span>@L["Field_Status"]</span><b>@(d.IsAvailable ? L["Status_Available"] : L["Status_Unavailable"])</b></div>
+            <div class="fact"><span>@L["Title_Images"]</span><b>@d.Images.Count</b></div>
+        </div>
+        <div class="d-flex gap-2 mt-auto">
+            <a class="btn btn-primary" asp-action="Edit" asp-route-id="@d.Id">@L["Btn_Edit"]</a>
+            <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@d.Id">@L["Btn_Delete"]</a>
+        </div>
+    </div>
+</section>
+
+<div class="page-head">
+    <div>
+        <h2 class="h3 mb-1">@L["Title_Images"] <span class="text-body-secondary fw-normal">(@d.Images.Count)</span></h2>
+        @if (d.Images.Count > 0)
+        {
+            <div class="text-body-secondary small">@L["Gallery_Hint"]</div>
+        }
+    </div>
+</div>
+
+@if (d.Images.Count == 0)
+{
+    <div class="surface empty-state mb-4">
+        <div class="icon">📷</div>
+        <p class="mt-2 mb-0">@L["Msg_NoImages"]</p>
+    </div>
+}
+else
+{
+    <div class="gallery">
+        @foreach (var img in d.Images)
+        {
+            <div class="gallery-item @(img.IsThumbnail ? "is-thumb" : "")">
+                <div class="ph">
+                    <div class="no-image position-absolute top-0 start-0 w-100 h-100"></div>
+                    <img src="@img.ImageUrl" alt="@d.Name" loading="lazy" class="position-relative" onerror="this.classList.add('img-broken')" />
+                    @if (img.IsThumbnail)
+                    {
+                        <span class="pill pill-thumb">★ @L["Field_IsThumbnail"]</span>
+                    }
+                </div>
+                <div class="ops">
+                    @if (!img.IsThumbnail)
+                    {
+                        <form asp-action="SetThumbnail" asp-route-id="@img.Id" method="post">
+                            <button type="submit" class="btn btn-sm btn-outline-primary w-100">★ @L["Btn_SetThumbnail"]</button>
+                        </form>
+                    }
+                    <form asp-action="DeleteImage" asp-route-id="@img.Id" method="post" style="@(img.IsThumbnail ? "" : "flex:0")"
+                          onsubmit="return confirm('@L["Msg_ConfirmDeleteImage"]');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger w-100" title="@L["Btn_DeleteImage"]">@(img.IsThumbnail ? L["Btn_DeleteImage"] : "✕")</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<div class="card">
+    <div class="card-header">＋ @L["Title_AddImage"]</div>
+    <div class="card-body">
+        <form asp-action="AddImage" asp-route-id="@d.Id" method="post" class="row g-2 align-items-end">
+            <div class="col-md-7">
+                <label asp-for="NewImage.ImageUrl" class="form-label"></label>
+                <input asp-for="NewImage.ImageUrl" class="form-control" placeholder="https://..." />
+                <span asp-validation-for="NewImage.ImageUrl" class="text-danger small"></span>
+            </div>
+            <div class="col-md-3">
+                <div class="form-check mb-2">
+                    <input asp-for="NewImage.IsThumbnail" class="form-check-input" />
+                    <label asp-for="NewImage.IsThumbnail" class="form-check-label"></label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success w-100">@L["Btn_AddImage"]</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

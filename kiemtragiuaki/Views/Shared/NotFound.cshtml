@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = L["Title_NotFound"];
+}
+<div class="text-center py-5">
+    <h1 class="display-5">404</h1>
+    <h2 class="h4 mb-3">@L["Title_NotFound"]</h2>
+    <div class="alert alert-warning d-inline-block">@ViewData["Message"]</div>
+    <div class="mt-3">
+        <a class="btn btn-primary" asp-controller="Dishes" asp-action="Index">@L["Menu_Dishes"]</a>
+        <a class="btn btn-outline-secondary" asp-controller="Categories" asp-action="Index">@L["Menu_Categories"]</a>
+    </div>
+</div>

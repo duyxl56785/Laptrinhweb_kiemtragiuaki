@@ -1,0 +1,117 @@
+@model DishFilterViewModel
+@{
+    ViewData["Title"] = L["Title_DishList"];
+}
+
+<section class="hero">
+    <div class="eyebrow">@L["Hero_Kicker"]</div>
+    <h1>@L["Title_DishList"]</h1>
+    <p>@L["Hero_Subtitle"]</p>
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+        <div class="hero-stats">
+            <div class="hero-stat"><b>@Model.TotalDishes</b><span>@L["Stat_Total"]</span></div>
+            <div class="hero-stat"><b>@Model.AvailableDishes</b><span>@L["Stat_Available"]</span></div>
+            <div class="hero-stat"><b>@Model.Categories.Count</b><span>@L["Stat_Categories"]</span></div>
+        </div>
+        <a class="btn btn-primary btn-lg" asp-action="Create">+ @L["Btn_CreateDish"]</a>
+    </div>
+</section>
+
+<form method="get" asp-action="Index" class="surface filter-panel">
+    <div class="panel-title">@L["Filter_Title"]</div>
+    <div class="row g-3">
+        <div class="col-lg-4 col-md-6">
+            <label class="form-label" for="search">@L["Filter_Search"]</label>
+            <input class="form-control" id="search" name="search" value="@Model.Search" placeholder="@L["Filter_SearchPlaceholder"]" />
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <label class="form-label" for="categoryId">@L["Field_Category"]</label>
+            <select class="form-select" id="categoryId" name="categoryId">
+                <option value="">@L["Filter_AllCategories"]</option>
+                @foreach (var c in Model.Categories)
+                {
+                    <option value="@c.Id" selected="@(Model.CategoryId == c.Id)">@c.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <label class="form-label" for="status">@L["Field_Status"]</label>
+            <select class="form-select" id="status" name="status">
+                <option value="">@L["Filter_AllStatus"]</option>
+                <option value="available" selected="@(Model.Status == "available")">@L["Status_Available"]</option>
+                <option value="unavailable" selected="@(Model.Status == "unavailable")">@L["Status_Unavailable"]</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-3 col-6">
+            <label class="form-label" for="minPrice">@L["Filter_MinPrice"]</label>
+            <input class="form-control" id="minPrice" name="minPrice" type="text" inputmode="decimal" value="@ViewData["MinPriceRaw"]" placeholder="0" />
+        </div>
+        <div class="col-lg-2 col-md-3 col-6">
+            <label class="form-label" for="maxPrice">@L["Filter_MaxPrice"]</label>
+            <input class="form-control" id="maxPrice" name="maxPrice" type="text" inputmode="decimal" value="@ViewData["MaxPriceRaw"]" placeholder="∞" />
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <label class="form-label" for="sort">@L["Filter_Sort"]</label>
+            <select class="form-select" id="sort" name="sort">
+                <option value="">@L["Sort_Default"]</option>
+                <option value="price_asc" selected="@(Model.Sort == "price_asc")">@L["Sort_PriceAsc"]</option>
+                <option value="price_desc" selected="@(Model.Sort == "price_desc")">@L["Sort_PriceDesc"]</option>
+                <option value="prep_asc" selected="@(Model.Sort == "prep_asc")">@L["Sort_PrepAsc"]</option>
+            </select>
+        </div>
+        <div class="col-lg-4 col-md-6 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-dark flex-grow-1">@L["Btn_Search"]</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">@L["Btn_Reset"]</a>
+        </div>
+    </div>
+</form>
+
+@foreach (var err in Model.Errors)
+{
+    <div class="alert alert-danger py-2">@err</div>
+}
+
+<div class="result-count">@L["ResultCount", Model.Dishes.Count]</div>
+
+@if (Model.Dishes.Count == 0)
+{
+    <div class="surface empty-state">
+        <div class="icon">🥢</div>
+        <p class="mt-2 mb-3">@L["Msg_NoResults"]</p>
+        <a class="btn btn-outline-secondary" asp-action="Index">@L["Btn_Reset"]</a>
+    </div>
+}
+else
+{
+    <div class="dish-grid">
+        @foreach (var d in Model.Dishes)
+        {
+            var thumb = d.Images.FirstOrDefault();
+            <article class="dish-card @(d.IsAvailable ? "" : "is-off")">
+                <a class="dish-media d-block" asp-action="Details" asp-route-id="@d.Id">
+                    <div class="no-image">@L["Msg_NoImage"]</div>
+                    @if (thumb != null)
+                    {
+                        <img src="@thumb.ImageUrl" alt="@d.Name" loading="lazy" class="position-relative"
+                             onerror="this.classList.add('img-broken')" />
+                    }
+                    <div class="tags"><partial name="_DishBadges" model="d" /></div>
+                </a>
+                <div class="dish-body">
+                    <div class="eyebrow">@d.DishCategory?.Name</div>
+                    <a class="dish-name" asp-action="Details" asp-route-id="@d.Id">@d.Name</a>
+                    <div class="dish-desc">@d.Description</div>
+                    <div class="dish-meta">
+                        <span class="price">@d.Price.ToString("N0")<small>đ</small></span>
+                        <span class="prep">⏱ @L["Minutes", d.PreparationTime]</span>
+                    </div>
+                </div>
+                <div class="dish-actions">
+                    <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@d.Id">@L["Btn_Details"]</a>
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@d.Id">@L["Btn_Edit"]</a>
+                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@d.Id" title="@L["Btn_Delete"]">✕</a>
+                </div>
+            </article>
+        }
+    </div>
+}

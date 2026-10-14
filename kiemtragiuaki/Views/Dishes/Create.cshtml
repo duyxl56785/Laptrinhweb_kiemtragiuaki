@@ -1,0 +1,18 @@
+@model Dish_BIT240081
+@{
+    ViewData["Title"] = L["Title_DishCreate"];
+}
+
+<h1 class="mb-3">@L["Title_DishCreate"]</h1>
+
+<form asp-action="Create" method="post" class="card card-body">
+    <partial name="_DishForm" model="Model" />
+    <div class="mt-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">@L["Btn_Save"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@L["Btn_Back"]</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

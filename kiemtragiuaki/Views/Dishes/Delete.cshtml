@@ -1,0 +1,24 @@
+@model Dish_BIT240081
+@{
+    ViewData["Title"] = L["Title_DishDelete"];
+}
+
+<h1 class="mb-3">@L["Title_DishDelete"]</h1>
+
+<div class="alert alert-warning">@L["Msg_ConfirmDeleteDish"]</div>
+
+<dl class="row surface p-3 mx-0">
+    <dt class="col-sm-3">@L["Field_Name"]</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+    <dt class="col-sm-3">@L["Field_Category"]</dt>
+    <dd class="col-sm-9">@Model.DishCategory?.Name</dd>
+    <dt class="col-sm-3">@L["Field_Price"]</dt>
+    <dd class="col-sm-9">@Model.Price.ToString("N0")</dd>
+    <dt class="col-sm-3">@L["Title_Images"]</dt>
+    <dd class="col-sm-9">@Model.Images.Count</dd>
+</dl>
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-flex gap-2">
+    <button type="submit" class="btn btn-danger">@L["Btn_ConfirmDelete"]</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">@L["Btn_Cancel"]</a>
+</form>

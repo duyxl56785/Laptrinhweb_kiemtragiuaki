@@ -1,0 +1,89 @@
+@{
+    var returnUrl = Context.Request.Method == "GET"
+        ? Context.Request.Path + Context.Request.QueryString
+        : Context.Request.Path.ToString();
+    var isVi = Translations.IsVietnamese;
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="@(isVi ? "vi" : "en")">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @L["AppName"]</title>
+    <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap&subset=vietnamese" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/kiemtragiuaki.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark app-nav mb-4">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Dishes" asp-action="Index">
+                    <span class="brand-seal" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 11h18a9 9 0 0 1-18 0Z" /><path d="M7 21h10" /><path d="M9 7c0-1.5 1-1.5 1-3M13 7c0-1.5 1-1.5 1-3" /><path d="M16 11 21 4" />
+                        </svg>
+                    </span>
+                    <span class="brand-text"><strong>@L["AppName"]</strong><small>BIT240081 · Mid-term</small></span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 ms-sm-3 gap-1">
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "Dishes" ? "active" : "")" asp-controller="Dishes" asp-action="Index">@L["Menu_Dishes"]</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "Categories" ? "active" : "")" asp-controller="Categories" asp-action="Index">@L["Menu_Categories"]</a>
+                        </li>
+                    </ul>
+                    <div class="lang-switch" role="group" aria-label="@L["Language"]">
+                        <a class="@(isVi ? "" : "active")" title="English"
+                           asp-controller="Home" asp-action="SetLanguage"
+                           asp-route-culture="@Translations.English" asp-route-returnUrl="@returnUrl">EN</a>
+                        <a class="@(isVi ? "active" : "")" title="Tiếng Việt"
+                           asp-controller="Home" asp-action="SetLanguage"
+                           asp-route-culture="@Translations.Vietnamese" asp-route-returnUrl="@returnUrl">VI</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @if (TempData["Success"] is string success)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @L[success]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["Error"] is string error)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @error
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            &copy; 2026 - @L["AppName"] - BIT240081
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

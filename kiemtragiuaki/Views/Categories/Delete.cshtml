@@ -1,0 +1,30 @@
+@model DishCategory_BIT240081
+@{
+    ViewData["Title"] = L["Title_CategoryDelete"];
+}
+
+<h1 class="mb-3">@L["Title_CategoryDelete"]</h1>
+
+@if (Model.Dishes.Count > 0)
+{
+    <div class="alert alert-danger">@L["Msg_CategoryInUse", Model.Name, Model.Dishes.Count]</div>
+}
+else
+{
+    <div class="alert alert-warning">@L["Msg_ConfirmDeleteCategory"]</div>
+}
+
+<dl class="row surface p-3 mx-0">
+    <dt class="col-sm-3">@L["Field_Name"]</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+    <dt class="col-sm-3">@L["Field_Description"]</dt>
+    <dd class="col-sm-9">@Model.Description</dd>
+    <dt class="col-sm-3">@L["Field_DishCount"]</dt>
+    <dd class="col-sm-9">@Model.Dishes.Count</dd>
+</dl>
+
+@* The button is always submitted to the server so the business rule is enforced there too. *@
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-flex gap-2">
+    <button type="submit" class="btn btn-danger">@L["Btn_ConfirmDelete"]</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">@L["Btn_Cancel"]</a>
+</form>
